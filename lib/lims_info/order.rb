@@ -1,53 +1,10 @@
-require 'yaml'
 
-require 'mechanize'
-require 'nokogiri'
 require 'open-uri'
+require 'nokogiri'
 
-module LimsInfo
-  class UserData
-    USERDATA_FILENAME = File.expand_path("~/.lims_info")
-    def self.fetch()
-      if !File.exists?(USERDATA_FILENAME)
-        puts "ERROR: cannot find User Data file: #{USERDATA_FILENAME}"
-        exit(1)
-      end
-      data = YAML.load_file(USERDATA_FILENAME)
-      if !data["username"]
-        puts "ERROR: #{USERDATA_FILENAME} does not contain username"
-        puts "please add"
-        exit(1)
-      end
-      if !data["password"]
-        puts "ERROR: #{USERDATA_FILENAME} does not contain password"
-        puts "please add"
-        exit(1)
-      end
-      data
-    end
-  end
-end
+require 'user_data'
+require 'lims_utils'
 
-module LimsInfo
-  class LimsUtils
-    # logs into lims using provided username and password
-    def self.login username, password
-      agent = Mechanize.new
-      agent.user_agent_alias = 'Mac Safari'
-      url = "http://limskc01/zanmodules/_site/index.php"
-
-      page = agent.get(url)
-      form = page.form_with :id => "auth"
-      username_field = form.field_with(:name => "username")
-      username_field.value = username
-
-      password_field = form.field_with(:name => "password")
-      password_field.value = password
-      form.submit
-      agent
-    end
-  end
-end
 
 module LimsInfo
   class Order
