@@ -1,0 +1,16 @@
+#!/usr/bin/env ruby
+# -*- mode: ruby -*-
+
+require 'lims_info'
+
+module LimsInfo
+  module Executable
+    def self.execute(command, args)
+    when "order", "-o"
+      LimsInfo::Order.start ARGV
+    end
+  end
+end
+
+command = ARGV.shift
+LimsInfo::Executable.execute(command, ARGV)
