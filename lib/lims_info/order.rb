@@ -2,8 +2,8 @@
 require 'open-uri'
 require 'nokogiri'
 
-require 'user_data'
-require 'lims_utils'
+require 'lims_info/user_data'
+require 'lims_info/lims_utils'
 
 
 module LimsInfo
