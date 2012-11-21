@@ -23,6 +23,7 @@ module LimsInfo
         puts "please add"
         exit(1)
       end
+      data
     end
   end
 end
