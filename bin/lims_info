@@ -5,9 +5,29 @@ require 'lims_info'
 
 module LimsInfo
   module Executable
+    HELP = <<-HELP
+    lims_info: providing the information you need from LIMs
+    Usage: lims_info [COMMAND] <PARAMETERS>
+
+    lims_info Commands:
+      version    - Print version number and exits
+      help       - Print this help and exits
+
+      order (-o) - Given an order_id, prints relevant flowcell 
+                   information. order_id should be in the form:
+                   MOLNG-123 or just the integer 123
+
+    HELP
     def self.execute(command, args)
-    when "order", "-o"
-      LimsInfo::Order.start ARGV
+      case command
+      when 'version', '-v'
+        require 'lims_info/version'
+        puts LimsInfo::Version
+      when "order", "-o"
+        LimsInfo::Order.start ARGV
+      else
+        puts LimsInfo::Executable::HELP
+      end
     end
   end
 end
