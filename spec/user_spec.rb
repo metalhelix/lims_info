@@ -15,7 +15,7 @@ describe LimsInfo::User do
     content = capture(:stdout) do
       # lambda { Hastie::Info.start @input }.should_not raise_error SystemExit
     end
-    @input = [""]
-    LimsInfo::Order.start @input
+    @input = ["ejr"]
+    LimsInfo::User.start @input
   end
 end

@@ -25,6 +25,8 @@ module LimsInfo
         puts LimsInfo::Version
       when "order", "-o"
         LimsInfo::Order.start ARGV
+      when "user", "-u"
+        LimsInfo::User.start ARGV
       else
         puts LimsInfo::Executable::HELP
       end
