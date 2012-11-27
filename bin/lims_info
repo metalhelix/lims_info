@@ -15,7 +15,10 @@ module LimsInfo
 
       order (-o) - Given an order_id, prints relevant flowcell 
                    information. order_id should be in the form:
-                   MOLNG-123 or just the integer 123
+                   MOLNG-123 or just the number 123
+
+      user (-u)  - Given a users login (their initials), prints
+                   all orders requested by this user
 
     HELP
     def self.execute(command, args)
@@ -27,6 +30,8 @@ module LimsInfo
         LimsInfo::Order.start ARGV
       when "user", "-u"
         LimsInfo::User.start ARGV
+      when "encrypt"
+        LimsInfo::Encrypt.obfuscate(ARGV.shift)
       else
         puts LimsInfo::Executable::HELP
       end

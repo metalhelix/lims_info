@@ -1,5 +1,7 @@
 require 'yaml'
 
+require 'lims_info/encrypt'
+
 module LimsInfo
   class UserData
     USERDATA_FILENAME = File.expand_path("~/.lims_info")
@@ -13,6 +15,10 @@ module LimsInfo
         puts "ERROR: #{USERDATA_FILENAME} does not contain username"
         puts "please add"
         exit(1)
+      end
+      if data["key"]
+        pass = Encrypt::decrypt(data["key"])
+        data["password"] = pass
       end
       if !data["password"]
         puts "ERROR: #{USERDATA_FILENAME} does not contain password"
