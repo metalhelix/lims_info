@@ -25,7 +25,7 @@ module LimsInfo
       case command
       when 'version', '-v'
         require 'lims_info/version'
-        puts LimsInfo::Version
+        puts LimsInfo::VERSION
       when "order", "-o"
         LimsInfo::Order.start ARGV
       when "user", "-u"
