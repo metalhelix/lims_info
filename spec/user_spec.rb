@@ -10,7 +10,7 @@ describe LimsInfo::User do
   after :each do
     # FileUtils.rm_r @output_dir if File.exists?(@output_dir)
   end
- 
+
   it "should work" do
     content = capture(:stdout) do
       # lambda { Hastie::Info.start @input }.should_not raise_error SystemExit

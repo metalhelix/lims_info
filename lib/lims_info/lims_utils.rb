@@ -24,7 +24,11 @@ module LimsInfo
     # output is an array of hashes
     def self.user_list agent
       # a semi-random order. shouldn't matter which, right?
-      url = "http://limskc01/zanmodules/molbio/ngs_editOrder.php?o=10"
+      # well it does matter - because different users have different levels
+      # of access to lims pages
+      #url = "http://limskc01/zanmodules/molbio/ngs_editOrder.php?o=10"
+      # so lets try the new ordre page
+      url = "http://limskc01/zanmodules/molbio/ngs_orderNew.php"
 
       # extra data is hidden in attributes of the options that are lost
       # when rendering the page.
