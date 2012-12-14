@@ -30,6 +30,8 @@ module LimsInfo
         LimsInfo::Order.start ARGV
       when "user", "-u"
         LimsInfo::User.start ARGV
+      when "flowcell", "-f"
+        LimsInfo::Flowcell.start ARGV
       when "encrypt"
         LimsInfo::Encrypt.obfuscate(ARGV.shift)
       else

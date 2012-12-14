@@ -1,8 +1,8 @@
 require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
-require 'lims_info/order'
+require 'lims_info/flowcell'
 
 
-describe LimsInfo::Order do
+describe LimsInfo::Flowcell do
 
   before :each do
     # @config_file = File.expand_path(File.join(File.dirname(__FILE__), "fixtures", "hastie_config"))
@@ -16,11 +16,11 @@ describe LimsInfo::Order do
   end
 
   it "should work" do
-    @input = ["MOLNG-266"]
+    @input = ["D16YVACXX"]
     content = capture(:stdout) do
-      lambda { LimsInfo::Order.start @input }.should_not raise_error SystemExit
+      lambda { LimsInfo::Flowcell.start @input }.should_not raise_error SystemExit
     end
-    content.split("\n").size.should >= 3
+    content.split("\n").size.should == 75
   end
 
 end
