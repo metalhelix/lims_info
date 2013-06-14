@@ -1,9 +1,5 @@
 
-require 'open-uri'
-require 'nokogiri'
-
-require 'lims_info/user_data'
-require 'lims_info/lims_utils'
+require 'lims_info/lims'
 
 
 module LimsInfo
@@ -25,8 +21,60 @@ module LimsInfo
         exit(1)
       end
 
-      data = get_order_data order_number
+      lims = LIMS.new
+      data = lims.order(order_number)
+
+      filter_failed(data)
+      data = squash_data(data)
       print_data(data)
+    end
+
+    def filter_failed data
+      data['flowcells'].select! {|f| f['status'] == 'DATA_DISTRIBUTED'}
+      data
+    end
+
+    def get_sample_on_lane order, flowcell, lane, library
+      sample = {}
+      sample['id'] = [flowcell['FCID'], lane['laneId'], library['sampleId']].join("_")
+      sample['name'] = library['sampleName']
+      sample['sample_id'] = library['sampleId']
+      sample['library_id'] = library['libId']
+      sample['flowcell'] = flowcell['FCID']
+      sample['lane'] = lane['laneId']
+      sample['index'] = library['indexSequences'] ? library['indexSequences'].join("-") : 'none'
+      sample['index_type'] = library['indexType']
+      sample['read_type'] = order['readType']
+      sample['species'] = library['speciesName']
+      sample['sample_type'] = library['sampleType']
+      sample['files'] = ["s_#{sample['lane']}_1_#{sample['index']}.fastq.gz"]
+      if order['readType'].downcase =~ /paired/
+        sample['files'] << "s_#{sample['lane']}_2_#{sample['index']}.fastq.gz"
+      end
+      sample['path'] = library['resultsLocations'].select {|l| l['FCID'] == flowcell['FCID']}[0]['path']
+      # sample['lane_comments'] = lane['comments']
+      sample['factors'] = library['factors']
+
+
+      sample
+    end
+
+    def squash_data data
+      new_data = {}
+      samples = []
+      data['flowcells'].each do |flowcell|
+        flowcell['lanes'].each do |lane|
+          lane['samples'].each do |library|
+            sample = get_sample_on_lane data, flowcell, lane, library
+            samples << sample
+          end
+        end
+      end
+      {'order' => 'prnOrderNo', 'status' => 'orderStatus', 'goals' => 'analysisGoals', 'type' => 'orderType', 'read_type' => 'readType', 'read_length' => 'readLength'}.each do |new_name, old_name|
+        new_data[new_name] = data[old_name]
+      end
+      new_data['data'] = samples
+      new_data
     end
 
     def clean_order order
@@ -34,38 +82,8 @@ module LimsInfo
       num
     end
 
-    def get_order_data order_number
-      user_data = UserData.fetch()
-      agent = LimsUtils::login(user_data["username"], user_data["password"])
-      flowcells = parse_flowcells(agent, order_number)
-      order_data = {"order_id" => "MOLNG-#{order_number}"}
-      order_data["flowcells"] = flowcells
-      order_data
-    end
-
-    def parse_flowcells agent, order_number
-      url = "http://limskc01/zanmodules/molbio/ajax/ngs_order_results.php?o=#{order_number}"
-      doc = agent.get(url).parser
-      flowcell_ids = doc.xpath("//table[@class='infotable'][1]/tbody/tr[1]/td/a")
-      flowcells = []
-      flowcell_ids.each_with_index do |fcid, fcid_index|
-        name = fcid.content
-        # awful way to do this - but what can you do
-        # the xpath returns all href's inside td's
-        # for my example, this returns the flowcell id's and the paths
-        # there are 3 paths for each flowcell
-        # so we skip the flowcell id's and get the second path listed
-        count = flowcell_ids.size
-        path = doc.xpath("//table[@class='infotable'][1]/tbody/tr/td/a")[(count - 1) + (fcid_index * 3) + 2].content
-        flowcells << {"fcid" => name, "path" => path}
-      end
-      flowcells
-    end
-
     def print_data data
-      data["flowcells"].each do |flowcell|
-        puts "#{flowcell["fcid"]}\t#{flowcell["path"]}"
-      end
+      puts data.to_yaml
     end
   end
 end

@@ -1,7 +1,10 @@
 #!/usr/bin/env ruby
 # -*- mode: ruby -*-
 
+$:.unshift(File.join(File.dirname(__FILE__), "..", "lib"))
+
 require 'lims_info'
+require 'optparse'
 
 module LimsInfo
   module Executable
@@ -13,11 +16,11 @@ module LimsInfo
       version    - Print version number and exits
       help       - Print this help and exits
 
-      order (-o) - Given an order_id, prints relevant flowcell 
+      order (o) - Given an order_id, prints relevant flowcell 
                    information. order_id should be in the form:
                    MOLNG-123 or just the number 123
 
-      user (-u)  - Given a users login (their initials), prints
+      user (u)  - Given a users login (their initials), prints
                    all orders requested by this user
 
     HELP
@@ -26,14 +29,16 @@ module LimsInfo
       when 'version', '-v'
         require 'lims_info/version'
         puts LimsInfo::VERSION
-      when "order", "-o"
-        LimsInfo::Order.start ARGV
-      when "user", "-u"
-        LimsInfo::User.start ARGV
-      when "flowcell", "-f"
-        LimsInfo::Flowcell.start ARGV
+      when "paths", "p"
+        LimsInfo::Paths.start args
+      when "order", "o"
+        LimsInfo::Order.start args
+      when "user", "u"
+        LimsInfo::User.start args
+      when "flowcell", "f"
+        LimsInfo::Flowcell.start args
       when "encrypt"
-        LimsInfo::Encrypt.obfuscate(ARGV.shift)
+        LimsInfo::Encrypt.obfuscate(args.shift)
       else
         puts LimsInfo::Executable::HELP
       end
@@ -42,4 +47,10 @@ module LimsInfo
 end
 
 command = ARGV.shift
+options = {}
+
+opts = OptionParser.new do |o|
+  o.on('-h', '--help', 'Displays help screen, then exits') {puts o; exit}
+end
+opts.parse!
 LimsInfo::Executable.execute(command, ARGV)
