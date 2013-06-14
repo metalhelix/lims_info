@@ -16,9 +16,15 @@ module LimsInfo
       version    - Print version number and exits
       help       - Print this help and exits
 
-      order (o) - Given an order_id, prints relevant flowcell 
+      paths (p) - Given an order_id, prints relevant flowcell
                    information. order_id should be in the form:
                    MOLNG-123 or just the number 123
+
+
+      order (o) - Given an order_id, prints information about
+                   data associated with that order in yaml. Only 
+                   distributed data is output. order_id should
+                   be in the form MOLNG-123 or just 123
 
       user (u)  - Given a users login (their initials), prints
                    all orders requested by this user
